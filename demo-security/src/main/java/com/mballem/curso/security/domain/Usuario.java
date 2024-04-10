@@ -1,10 +1,16 @@
 package com.mballem.curso.security.domain;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import ch.qos.logback.core.pattern.color.BoldCyanCompositeConverter;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Index;
@@ -16,7 +22,7 @@ import jakarta.persistence.Table;
 @SuppressWarnings("serial")
 @Entity
 @Table(name = "usuarios", indexes = {@Index(name = "idx_usuario_email", columnList = "email")})
-public class Usuario extends AbstractEntity {	
+public class Usuario extends AbstractEntity  implements UserDetails{	
 	
 	@Column(name = "email", unique = true, nullable = false)
 	private String email;
@@ -72,7 +78,7 @@ public class Usuario extends AbstractEntity {
 	}
 
 	public void setSenha(String senha) {
-		this.senha = senha;
+		this.senha = new BCryptPasswordEncoder().encode(senha);
 	}
 
 	public List<Perfil> getPerfis() {
@@ -97,6 +103,46 @@ public class Usuario extends AbstractEntity {
 
 	public void setCodigoVerificador(String codigoVerificador) {
 		this.codigoVerificador = codigoVerificador;
+	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return perfis;
+	}
+
+	@Override
+	public String getPassword() {
+		// TODO Auto-generated method stub
+		return senha;
+	}
+
+	@Override
+	public String getUsername() {
+		return email;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }
